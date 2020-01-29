@@ -3,7 +3,9 @@
     v-draggable
     @updatePosition="updatePosition"
     class="block"
-    :style="`top: ${top}; left: ${left}`"
+    :style="
+      `top: ${top}; left: ${left}; width: ${width}px; height: ${height}px`
+    "
   >
     <div>position: {{ left }} x {{ top }}</div>
     <div>{{ name }}</div>
@@ -13,34 +15,29 @@
 <script>
 export default {
   name: "DragArea",
-  props: ["name"],
-  data: () => ({ left: 0, top: 0 }),
+  props: ["name", "changePosition"],
+  data: () => ({ left: 0, top: 0, width: 200, height: 200 }),
   mounted() {
     const getRandomPosition = max => {
-      max = max - 200;
+      max = max - this.width;
       return Math.floor(Math.random() * Math.floor(max));
     };
 
     let left = getRandomPosition(innerWidth) + "px";
     let top = getRandomPosition(innerHeight) + "px";
-    this.updatePosition(left, top);
+    this.updatePosition({ left, top });
   },
   methods: {
-    updatePosition(left, top) {
-      const $left = left;
-      const $top = top;
-      if (left !== $left && top !== $top) {
-        // debugger;
-      }
+    updatePosition({ left, top }) {
       this.left = left;
       this.top = top;
+      this.changePosition({ name: this.name, x: left, y: top });
     }
   },
   directives: {
     draggable: (el, binding, vNode) => {
-      // const updatePosition = vNode.data.on.updatePosition.fns;
-      const updatePosition = vNode.context.$emit('updatePosition');
-      
+      console.log(binding, vNode);
+      const updatePosition = vNode.data.on.updatePosition.fns;
 
       el.onmousedown = event => {
         el.style.zIndex = 1000;
@@ -52,7 +49,7 @@ export default {
           let top = event.pageY - shiftY + "px";
           // el.style.left = left;
           // el.style.top = top;
-          updatePosition(left, top);
+          updatePosition({ left, top });
         };
 
         document.addEventListener("mousemove", onMouseMove);
@@ -76,8 +73,6 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 200px;
-  width: 200px;
   border: 1px solid #2c3e50;
 }
 </style>
