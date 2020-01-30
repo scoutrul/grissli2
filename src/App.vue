@@ -1,9 +1,12 @@
 <template>
   <div id="app">
-    <DragArea name="first" :changePosition="changePosition" />
-    <DragArea name="second" :changePosition="changePosition" />
-    <DragArea name="third" :changePosition="changePosition" />
-    <DragArea name="four" :changePosition="changePosition" />
+    <DragArea
+      v-for="(item, i) in items"
+      :key="i"
+      :name="item.name"
+      :changePosition="changePosition"
+      :bgColor="item.bgColor"
+    />
     <div class="droppable">
       <div>
         drop area
@@ -23,20 +26,34 @@ export default {
   data: () => ({
     items: {
       first: {
-        x: 100,
-        y: 100,
+        name: "first",
         bgColor: "grey",
         freeze: false,
         shrink: false
+      },
+      second: {
+        name: "second"
+      },
+      third: {
+        name: "third"
+      },
+      four: {
+        name: "four"
       }
     }
   }),
   methods: {
     changePosition({ name, x, y }) {
-      this.items.first.x = x;
-      this.items.first.y = y;
-      // this.items[name].y = y;
-      // ошибки
+      this.items = {
+        ...this.items,
+        [name]: {
+          ...this.items[name],
+          x,
+          y
+        }
+      };
+      // this.checkItem({ name, x, y });
+      this.checkDropZone({ name, x, y });
 
       // метод, который прокрутит все items
       // сравнит их позиции
@@ -45,6 +62,23 @@ export default {
       // если не фриз,
       // если ужато, когда внутри
       // то назначить им цвета
+    },
+    checkItem({ name, x, y }) {
+      // debugger;
+      let elem = document.elementFromPoint(x, y);
+
+      elem.style.background = "pink";
+    },
+    checkDropZone({ name, x, y }) {
+      let dropZone = document
+        .getElementsByClassName("droppable")[0]
+        .getBoundingClientRect();
+      let condition = x > dropZone.x - 100 && y > dropZone.y - 100;
+      if (condition) {
+        this.items[name].bgColor = "black";
+      } else {
+        this.items[name].bgColor = "pink";
+      }
     }
   }
 };

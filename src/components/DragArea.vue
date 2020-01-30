@@ -4,7 +4,7 @@
     @updatePosition="updatePosition"
     class="block"
     :style="
-      `top: ${top}; left: ${left}; width: ${width}px; height: ${height}px`
+      `top: ${top}px; left: ${left}px; width: ${width}px; height: ${height}px; background: ${bgColor}`
     "
   >
     <div>position: {{ left }} x {{ top }}</div>
@@ -15,7 +15,7 @@
 <script>
 export default {
   name: "DragArea",
-  props: ["name", "changePosition"],
+  props: ["name", "changePosition", "bgColor"],
   data: () => ({ left: 0, top: 0, width: 200, height: 200 }),
   mounted() {
     const getRandomPosition = max => {
@@ -23,8 +23,8 @@ export default {
       return Math.floor(Math.random() * Math.floor(max));
     };
 
-    let left = getRandomPosition(innerWidth) + "px";
-    let top = getRandomPosition(innerHeight) + "px";
+    let left = getRandomPosition(innerWidth);
+    let top = getRandomPosition(innerHeight);
     this.updatePosition({ left, top });
   },
   methods: {
@@ -36,7 +36,7 @@ export default {
   },
   directives: {
     draggable: (el, binding, vNode) => {
-      console.log(binding, vNode);
+      // console.log(binding, vNode);
       const updatePosition = vNode.data.on.updatePosition.fns;
 
       el.onmousedown = event => {
@@ -45,8 +45,8 @@ export default {
         let shiftY = event.clientY - el.getBoundingClientRect().top;
 
         const onMouseMove = event => {
-          let left = event.pageX - shiftX + "px";
-          let top = event.pageY - shiftY + "px";
+          let left = event.pageX - shiftX;
+          let top = event.pageY - shiftY;
           // el.style.left = left;
           // el.style.top = top;
           updatePosition({ left, top });
